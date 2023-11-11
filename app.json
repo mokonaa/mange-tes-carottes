@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "eat-your-carots",
-    "slug": "eat-your-carots",
+    "name": "mange-tes-carottes",
+    "slug": "mange-tes-carottes",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
