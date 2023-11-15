@@ -1,14 +1,6 @@
-import supabase from './src/config/supabaseClient';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import HomeScreen from './src/screens/HomeScreen';
 
 export default function App() {
-  console.log(supabase);
-  return (
-    <View>
-      <Text>
-        Hello World!
-      </Text>
-    </View>
-  );
+  return <HomeScreen />;
 }
-

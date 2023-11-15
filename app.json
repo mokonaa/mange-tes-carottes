@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "mange-tes-carottes-scheme",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -26,13 +27,17 @@
       "package": "com.mokonaa.eatyourcarots"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "extra": {
       "eas": {
         "projectId": "731c21a3-e8ac-4388-9c88-b74ca2dd4eaf"
       }
     },
-    "owner": "mokonaa"
+    "owner": "mokonaa",
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
