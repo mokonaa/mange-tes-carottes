@@ -8,3 +8,6 @@ logs
 node_modules
 bower_components
 .vercel
+
+ios
+android

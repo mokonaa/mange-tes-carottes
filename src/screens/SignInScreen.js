@@ -1,4 +1,4 @@
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, Text } from 'react-native';
 import React, { useState } from 'react';
 import Logo from '../assets/logo-solo.svg';
 import { useCallback } from 'react';
@@ -8,10 +8,12 @@ import FlatButton from '../components/FlatButton';
 import ContainerText from '../components/ContainerText';
 import Input from '../components/Input';
 import supabase from '../config/supabaseClient';
+import BackButton from '../components/BackButton';
+import InputPassword from '../components/InputPassword';
 
 SplashScreen.preventAutoHideAsync();
 
-function SignInScreen() {
+function SignInScreen({ navigation }) {
     // States to hold the values of the TextInputs
     const [pseudo, setPseudo] = useState('');
     const [prenom, setPrenom] = useState('');
@@ -90,64 +92,81 @@ function SignInScreen() {
     }
 
     return (
-        <View style={styles.container} onLayout={onLayoutRootView}>
-            <View style={styles.containerInputText}>
-                <Logo style={styles.logo} height={34} width={35} />
-                <ContainerText
-                    textValue="Super ! Tu peux commencer avec la création de ton compte !"
-                    titleValue="Créer ton compte"
-                />
-                <View style={styles.containerInput}>
-                    <Input
-                        labelValue="Pseudo"
-                        placeholderValue="Entre ton pseudo"
-                        onChange={(text) => handleInputChange(text, 'pseudo')}
-                    />
-                    <Input
-                        labelValue="Prénom"
-                        placeholderValue="Entre ton prénom"
-                        onChange={(text) => handleInputChange(text, 'prenom')}
-                    />
-                    <Input
-                        labelValue="Adresse email"
-                        placeholderValue="Entre ton adresse email"
-                        onChange={(text) => handleInputChange(text, 'email')}
-                    />
-                    <Input
-                        labelValue="Mot de passe"
-                        placeholderValue="Entre ton mot de passe"
-                        onChange={(text) => handleInputChange(text, 'password')}
-                        valuePassword={true}
+        <SafeAreaView>
+            <View style={styles.wholeContainer}>
+                <BackButton onPress={() => navigation.navigate('Home')} />
+                <ScrollView style={styles.container} onLayout={onLayoutRootView}>
+                    <View style={styles.containerInputText}>
+                        <Logo style={styles.logo} height={34} width={35} />
+                        <ContainerText
+                            textValue="Super ! Tu peux commencer avec la création de ton compte !"
+                            titleValue="Créer ton compte"
+                        />
+                        <View style={styles.containerInput}>
+                            <Input
+                                labelValue="Pseudo"
+                                placeholderValue="Entre ton pseudo"
+                                onChange={(text) => handleInputChange(text, 'pseudo')}
+                            />
+                            <Input
+                                labelValue="Prénom"
+                                placeholderValue="Entre ton prénom"
+                                onChange={(text) => handleInputChange(text, 'prenom')}
+                            />
+                            <Input
+                                labelValue="Adresse email"
+                                placeholderValue="Entre ton adresse email"
+                                onChange={(text) => handleInputChange(text, 'email')}
+                            />
+                            <InputPassword
+                                labelValue="Mot de passe"
+                                placeholderValue="Entre ton mot de passe"
+                                onChange={(text) => handleInputChange(text, 'password')}
+                                valuePassword={true}
+                            />
+                        </View>
+                    </View>
+                </ScrollView>
+                <View style={styles.containerButtons}>
+                    <View style={styles.subcontainerButtons}>
+                        <Text style={styles.textLogInButton}>
+                            Tu as déjà un compte ?
+                        </Text>
+                        <Text style={styles.logInButton} onPress={() => navigation.navigate('Connecter')}>
+                            Connecte-toi
+                        </Text>
+                    </View>
+                    <FlatButton
+                        textValue="Suivant"
+                        onPress={signIn}
+                        backgroundColor="#2A843D"
+                        colorText="#fff"
                     />
                 </View>
             </View>
-            <View style={styles.containerButtons}>
-                <FlatButton
-                    textValue="Suivant"
-                    onPress={signIn}
-                    backgroundColor="#2A843D"
-                    colorText="#fff"
-                />
-            </View>
-        </View>
+        </SafeAreaView>
+
+
     );
 }
 
 export default SignInScreen;
 
 const styles = StyleSheet.create({
+    wholeContainer: {
+        paddingVertical: 8,
+        paddingHorizontal: 24,
+        height: '100%',
+        justifyContent: 'space-between'
+    },
     container: {
         flex: 1,
-        paddingHorizontal: 24,
-        paddingVertical: 48,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: 48,
     },
     containerInputText: {
         alignItems: 'center',
         width: '100%',
-        gap: 40,
+        paddingVertical: 16,
+        gap: 24,
     },
     containerInput: {
         width: '100%',
@@ -158,6 +177,27 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     containerButtons: {
+        paddingTop: 8,
         width: '100%',
+        gap: 16,
     },
+    subcontainerButtons: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    textLogInButton: {
+        fontFamily: 'Nunito-Medium',
+    },
+    logInButton: {
+        paddingLeft: 4,
+        fontFamily: 'Nunito-Medium',
+        color: "#CC4B00",
+        textDecorationLine: 'underline',
+    },
+    forgot: {
+        fontFamily: 'Nunito-Medium',
+        textAlign: 'right',
+        color: "#CC4B00",
+    }
 });

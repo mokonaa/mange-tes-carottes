@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
-const Input = ({ labelValue, placeholderValue, onChange, valuePassword}) => {
+const Input = ({ labelValue, placeholderValue, onChange }) => {
     const [fontsLoaded] = useFonts({
         'Nunito-Bold': require('../assets/fonts/Nunito-Bold.ttf'),
     });
@@ -20,11 +20,12 @@ const Input = ({ labelValue, placeholderValue, onChange, valuePassword}) => {
     return (
         <View style={styles.container}>
             <Text style={styles.label}>{labelValue}</Text>
-            <TextInput
-                style={styles.input}
-                placeholder={placeholderValue}
-                onChangeText={onChange} secureTextEntry={valuePassword}
-            />
+            <View style={styles.input}>
+                <TextInput
+                    placeholder={placeholderValue}
+                    onChangeText={onChange}
+                />
+            </View>
         </View >
     )
 }
@@ -50,9 +51,4 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#E8E8E8',
     },
-    placeholder: {
-        color: '#E8E8E8',
-        fontFamily: 'Nunito-Bold',
-        fontSize: 14,
-    }
 });

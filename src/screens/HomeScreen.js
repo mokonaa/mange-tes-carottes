@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, Image } from 'react-native'
-import React from 'react';
+import { View, Text, StyleSheet, Image, SafeAreaView, ScrollView, Dimensions } from 'react-native'
+import { React, useState, useEffect } from 'react';
 import Logo from '../assets/logo.svg'
 import { useCallback } from 'react';
 import { useFonts } from 'expo-font';
@@ -7,7 +7,23 @@ import * as SplashScreen from 'expo-splash-screen';
 import FlatButton from '../components/FlatButton';
 
 SplashScreen.preventAutoHideAsync();
-function HomeScreen() {
+function HomeScreen({ navigation }) {
+    const [isComponentVisible, setIsComponentVisible] = useState(true);
+    useEffect(() => {
+        const handleScreenResize = () => {
+            const { width } = Dimensions.get('window');
+            const thresholdWidth = 375;
+
+            setIsComponentVisible(width > thresholdWidth);
+        };
+
+        Dimensions.addEventListener('change', handleScreenResize);
+        handleScreenResize();
+
+        return () => {
+            Dimensions.removeEventListener('change', handleScreenResize);
+        };
+    }, [])
     const [fontsLoaded] = useFonts({
         'Nunito-ExtraBold': require('../assets/fonts/Nunito-ExtraBold.ttf'),
     });
@@ -21,35 +37,39 @@ function HomeScreen() {
         return null;
     }
 
-    const handlePress = () => {
-        // Your button press logic here
-        console.log('Button pressed!');
-    };
     return (
-        <View style={styles.container} onLayout={onLayoutRootView}>
-            <Image style={styles.image} source={require('../assets/img/homepage_image.jpg')} />
-            <View style={styles.containerText}>
-                <Logo style={styles.logo} height={45} width={216} />
-                <Text style={styles.title}>Une application qui t’aide à suivre ton alimentation</Text>
+        <SafeAreaView style={styles.wholeContainer}>
+            <View style={styles.container} onLayout={onLayoutRootView}>
+                {isComponentVisible && (
+                    <Image style={styles.image} source={require('../assets/img/homepage_image.jpg')} />
+                )}
+                <View style={styles.containerText}>
+                    <Logo style={styles.logo} height={45} width={216} />
+                    <Text style={styles.title}>Une application pour suivre ton alimentation</Text>
+                </View>
+                <View style={styles.containerButtons}>
+                    <FlatButton textValue="Créer un compte" onPress={() => navigation.navigate('Creer')} backgroundColor="#2A843D" colorText="#fff" />
+                    <FlatButton textValue="Se connecter" onPress={() => navigation.navigate('Connecter')} backgroundColor="#E8E8E8" colorText="#000" />
+                </View>
             </View>
-            <View style={styles.containerButtons}>
-                <FlatButton textValue="Créer un compte" onPress={handlePress} backgroundColor="#2A843D" colorText="#fff" />
-                <FlatButton textValue="S'inscrire" onPress={handlePress} backgroundColor="#E8E8E8" colorText="#000" />
-            </View>
-        </View>
+        </SafeAreaView>
     )
 }
 
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+    wholeContainer: {
+        height: '100%',
+    },
     container: {
         flex: 1,
         paddingHorizontal: 24,
-        paddingVertical: 48,
-        justifyContent: 'center',
+        paddingTop: 16,
+        paddingBottom: 8,
+        justifyContent: 'space-between',
         alignItems: 'center',
-        gap: 48,
+        height: '100%',
     },
     image: {
         width: '100%',
