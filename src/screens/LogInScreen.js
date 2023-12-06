@@ -34,21 +34,23 @@ function LogInScreen({ navigation }) {
     };
     const logIn = async () => {
         try {
-            const { user, error } = await supabase.auth.signInWithPassword({
+            const { error } = await supabase.auth.signInWithPassword({
                 email: email,
                 password: password,
             });
-
+            const { data: { user } } = await supabase.auth.getUser()
+            console.log('User Object:', user);
             if (error) {
-                console.error('Error signing in:', error.email);
+                console.error('Error signing in:', error.message);
                 return;
             }
-            console.log('User signed in:', email);
-            setSignIn(true);
+            console.log('User signed in with email:', user.email);
+            navigation.navigate('SuccessSignIn', { userEmail: user.email });
         } catch (error) {
             console.error('Unexpected error:', error.message);
         }
     };
+    
 
     const [fontsLoaded] = useFonts({
         'Nunito-ExtraBold': require('../assets/fonts/Nunito-ExtraBold.ttf'),
@@ -107,13 +109,13 @@ function LogInScreen({ navigation }) {
                         <Text style={styles.textSignInButton}>
                             Pas de compte ?
                         </Text>
-                        <Text style={styles.signInButton} onPress={() => navigation.navigate('Creer')}>
+                        <Text style={styles.signInButton} onPress={() => navigation.navigate('CreerStep1')}>
                             Inscris-toi !
                         </Text>
                     </View>
                     <FlatButton
                         textValue="Suivant"
-                        onPress={signIn}
+                        onPress={logIn}
                         backgroundColor="#2A843D"
                         colorText="#fff"
                     />

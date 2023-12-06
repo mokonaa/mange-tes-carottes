@@ -48,7 +48,7 @@ function HomeScreen({ navigation }) {
                     <Text style={styles.title}>Une application pour suivre ton alimentation</Text>
                 </View>
                 <View style={styles.containerButtons}>
-                    <FlatButton textValue="Créer un compte" onPress={() => navigation.navigate('Creer')} backgroundColor="#2A843D" colorText="#fff" />
+                    <FlatButton textValue="Créer un compte" onPress={() => navigation.navigate('CreerStep1')} backgroundColor="#2A843D" colorText="#fff" />
                     <FlatButton textValue="Se connecter" onPress={() => navigation.navigate('Connecter')} backgroundColor="#E8E8E8" colorText="#000" />
                 </View>
             </View>

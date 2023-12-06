@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView, SafeAreaView, Text } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, Text, Alert } from 'react-native';
 import React, { useState } from 'react';
 import Logo from '../assets/logo-solo.svg';
 import { useCallback } from 'react';
@@ -6,75 +6,68 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import FlatButton from '../components/FlatButton';
 import ContainerText from '../components/ContainerText';
-import Input from '../components/Input';
+import InputPassword from '../components/InputPassword';
 import supabase from '../config/supabaseClient';
 import BackButton from '../components/BackButton';
-import InputPassword from '../components/InputPassword';
 
 SplashScreen.preventAutoHideAsync();
 
-function SignInScreen({ navigation }) {
-    // States to hold the values of the TextInputs
-    const [pseudo, setPseudo] = useState('');
-    const [prenom, setPrenom] = useState('');
-    const [email, setEmail] = useState('');
+function SignInStep2({ route, navigation }) {
+    const { pseudo, prenom, email } = route.params;
     const [password, setPassword] = useState('');
-
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const arePasswordsEqual = password === confirmPassword;
     const handleInputChange = (value, inputName) => {
-        // Update the corresponding state based on the inputName
         switch (inputName) {
-            case 'pseudo':
-                setPseudo(value);
-                break;
-            case 'prenom':
-                setPrenom(value);
-                break;
-            case 'email':
-                setEmail(value);
-                break;
             case 'password':
                 setPassword(value);
+                break;
+            case 'confirmPassword':
+                setConfirmPassword(value);
                 break;
             default:
                 break;
         }
     };
 
-    async function signIn() {
-
-        console.log('Pseudo:', pseudo);
-        console.log('Prénom:', prenom);
-        console.log('Adresse email:', email);
-        console.log('Mdp:', password);
-        try {
-            const { user, error } = await supabase.auth.signUp({
-                email: email,
-                password: password,
-            });
-
-            if (error) {
-                console.error('Erreur : ', error.message);
-                return;
+    const handleButtonPress = async () => {
+        const allInputsFilled = pseudo.trim() !== '' && prenom.trim() !== '' && email.trim() !== '';
+        const isValidPassword = password.length >= 6;
+    
+        if (!allInputsFilled) {
+            Alert.alert('Les champs ne sont pas remplis', 'Tu n\'as pas rempli tous les champs.');
+        } else if (!isValidPassword) {
+            Alert.alert('Mot de passe invalide', 'Le mot de passe doit avoir au moins 6 caractères.');
+        } else if (!arePasswordsEqual) {
+            Alert.alert('Erreur', 'Les mots de passe ne correspondent pas.');
+        } else {
+            try {
+                const { user, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                });
+    
+                if (error) {
+                    console.error('Erreur : ', error.message);
+                    return;
+                }
+                const { data, error: sqlError } = await supabase
+                    .from('utilisateurs')
+                    .insert([
+                        { pseudo: pseudo, prenom: prenom, email: email },
+                    ])
+                    navigation.navigate('SignInStep3');
+    
+                if (sqlError) {
+                    console.error('Error executing SQL query:', sqlError.message);
+                    return;
+                }
+            } catch (error) {
+                console.error('Unexpected error:', error.message);
             }
-            const { data, error: sqlError } = await supabase
-                .from('utilisateurs')
-                .insert([
-                    { pseudo: pseudo, prenom: prenom, email: email },
-                ]);
+        };
+    };
 
-            if (sqlError) {
-                console.error('Error executing SQL query:', sqlError.message);
-                // Handle the SQL error
-                return;
-            }
-
-            // SQL query executed successfully
-            console.log('User registered and SQL query executed:', data);
-        } catch (error) {
-            console.error('Unexpected error:', error.message);
-            // Handle unexpected errors
-        }
-    }
 
     const [fontsLoaded] = useFonts({
         'Nunito-ExtraBold': require('../assets/fonts/Nunito-ExtraBold.ttf'),
@@ -94,34 +87,25 @@ function SignInScreen({ navigation }) {
     return (
         <SafeAreaView>
             <View style={styles.wholeContainer}>
-                <BackButton onPress={() => navigation.navigate('Home')} />
+                <BackButton onPress={() => navigation.navigate('CreerStep1')} />
                 <ScrollView style={styles.container} onLayout={onLayoutRootView}>
                     <View style={styles.containerInputText}>
                         <Logo style={styles.logo} height={34} width={35} />
                         <ContainerText
-                            textValue="Super ! Tu peux commencer avec la création de ton compte !"
+                            textValue="Il manque plus que ton mot de passe à rajouter !"
                             titleValue="Créer ton compte"
                         />
                         <View style={styles.containerInput}>
-                            <Input
-                                labelValue="Pseudo"
-                                placeholderValue="Entre ton pseudo"
-                                onChange={(text) => handleInputChange(text, 'pseudo')}
-                            />
-                            <Input
-                                labelValue="Prénom"
-                                placeholderValue="Entre ton prénom"
-                                onChange={(text) => handleInputChange(text, 'prenom')}
-                            />
-                            <Input
-                                labelValue="Adresse email"
-                                placeholderValue="Entre ton adresse email"
-                                onChange={(text) => handleInputChange(text, 'email')}
-                            />
                             <InputPassword
                                 labelValue="Mot de passe"
                                 placeholderValue="Entre ton mot de passe"
                                 onChange={(text) => handleInputChange(text, 'password')}
+                                valuePassword={true}
+                            />
+                            <InputPassword
+                                labelValue="Confirme ton mot de passe"
+                                placeholderValue="Entre à nouveau ton mot de passe"
+                                onChange={(text) => handleInputChange(text, 'confirmPassword')}
                                 valuePassword={true}
                             />
                         </View>
@@ -132,13 +116,16 @@ function SignInScreen({ navigation }) {
                         <Text style={styles.textLogInButton}>
                             Tu as déjà un compte ?
                         </Text>
-                        <Text style={styles.logInButton} onPress={() => navigation.navigate('Connecter')}>
+                        <Text
+                            style={styles.logInButton}
+                            onPress={() => navigation.navigate('Connecter')}
+                        >
                             Connecte-toi
                         </Text>
                     </View>
                     <FlatButton
-                        textValue="Suivant"
-                        onPress={signIn}
+                        textValue="S'inscrire"
+                        onPress={handleButtonPress}
                         backgroundColor="#2A843D"
                         colorText="#fff"
                     />
@@ -148,14 +135,14 @@ function SignInScreen({ navigation }) {
     );
 }
 
-export default SignInScreen;
+export default SignInStep2;
 
 const styles = StyleSheet.create({
     wholeContainer: {
         paddingVertical: 8,
         paddingHorizontal: 24,
         height: '100%',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
     container: {
         flex: 1,
@@ -190,12 +177,12 @@ const styles = StyleSheet.create({
     logInButton: {
         paddingLeft: 4,
         fontFamily: 'Nunito-Medium',
-        color: "#CC4B00",
+        color: '#CC4B00',
         textDecorationLine: 'underline',
     },
     forgot: {
         fontFamily: 'Nunito-Medium',
         textAlign: 'right',
-        color: "#CC4B00",
-    }
+        color: '#CC4B00',
+    },
 });

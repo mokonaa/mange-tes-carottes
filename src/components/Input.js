@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
-const Input = ({ labelValue, placeholderValue, onChange }) => {
+const Input = ({ labelValue, placeholderValue, onChange, keyboardType }) => {
     const [fontsLoaded] = useFonts({
         'Nunito-Bold': require('../assets/fonts/Nunito-Bold.ttf'),
     });
@@ -24,6 +24,9 @@ const Input = ({ labelValue, placeholderValue, onChange }) => {
                 <TextInput
                     placeholder={placeholderValue}
                     onChangeText={onChange}
+                    keyboardType={keyboardType}
+                    autoCapitalize="none"
+                    autoCorrect={false}
                 />
             </View>
         </View >

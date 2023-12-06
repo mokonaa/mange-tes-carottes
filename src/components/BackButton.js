@@ -6,18 +6,6 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
 const BackButton = ({ onPress }) => {
-    const [fontsLoaded] = useFonts({
-        'Nunito-Medium': require('../assets/fonts/Nunito-Medium.ttf'),
-    });
-
-    const onLayoutRootView = useCallback(async () => {
-        if (fontsLoaded) {
-            await SplashScreen.hideAsync();
-        }
-    }, [fontsLoaded]);
-    if (!fontsLoaded) {
-        return null;
-    }
     return (
         <TouchableOpacity style={styles.container} onPress={onPress}>
             <Arrow height={16} width={16} />
@@ -37,6 +25,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         paddingLeft: 8,
+        fontSize: 14,
         fontFamily: 'Nunito-Medium',
     },
 });
